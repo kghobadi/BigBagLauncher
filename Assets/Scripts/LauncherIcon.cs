@@ -35,7 +35,7 @@ public class LauncherIcon : MonoBehaviour
     /// Called on set up from BBL.
     /// </summary>
     /// <param name="path"></param>
-    public void SetupIcon(string path)
+    public void SetupIcon(string path, string gameName, Sprite icon)
     {
         launchPath = path;
     }

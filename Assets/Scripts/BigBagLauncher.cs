@@ -107,8 +107,10 @@ public class BigBagLauncher : MonoBehaviour
         GameObject launchIcon = Instantiate(launchIconPrefab, launcherMenu.content.transform);
         //get launch icon script
         LauncherIcon launcherIcon = launchIcon.GetComponent<LauncherIcon>();
+        //need to supply filename and icon as well 
+        //Sprite icon = Icon.ExtractAssociatedIcon(path);
         //give it selection capability 
-        launcherIcon.SetupIcon(path);
+        //launcherIcon.SetupIcon(path, "", icon);
     }
 
     void FindAndCopyExternalBuilds()
