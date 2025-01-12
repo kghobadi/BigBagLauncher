@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using IconExtraction;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.WSA;
@@ -32,6 +34,9 @@ public class BigBagLauncher : MonoBehaviour
     [SerializeField] private ScrollRect launcherMenu;
     //runtime list of launch icons generated for the menu 
     private List<GameObject> launchIcons = new List<GameObject>();
+
+    [Tooltip("This array should match the expected builds for output. Will automatically use them, or try to pull from .exe icons.")]
+    [SerializeField] private Sprite[] launchIconSprites;
     
     //Should
     //For images contained in the launcher
@@ -63,26 +68,26 @@ public class BigBagLauncher : MonoBehaviour
         {
             //Get all build files in a given directory
             string[] buildFiles = Directory.GetFiles(buildDirectories[i]);
+            
             //loop through build files
             for (int f = 0; f < buildFiles.Length; f++)
             {
                 //For windows
                 //find all Unity .exe files within build folder
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-                if (buildFiles[i].EndsWith(".exe"))
+                if (buildFiles[f].EndsWith(".exe") && !buildFiles[f].Contains("CrashHandler"))
                 {
-                    launchFiles[i] = buildFiles[i];
+                    launchFiles[i] = buildFiles[f];
+                    CreateLaunchIcon(launchFiles[i], i);
                 }
-                CreateLaunchIcon(launchFiles[i]);
-                return;
-#elif UNITY_STANDALONE
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
                 //For Mac 
                 //find all Unity .app folders/files? in build folder  
-                if (buildFiles[i].EndsWith(".app"))
+                if (buildFiles[f].EndsWith(".app"))
                 {
-                    launchFiles[i] = buildFiles[i];
+                    launchFiles[i] = buildFiles[f];
+                    CreateLaunchIcon(launchFiles[i], i);
                 }
-                CreateLaunchIcon(launchFiles[i]);
 #endif
             }
         }
@@ -102,15 +107,23 @@ public class BigBagLauncher : MonoBehaviour
     /// Creates instance of launch Icon with provided path
     /// </summary>
     /// <param name="path"></param>
-    void CreateLaunchIcon(string path)
+    /// <param name="index"></param>
+    void CreateLaunchIcon(string path, int index)
     {
         GameObject launchIcon = Instantiate(launchIconPrefab, launcherMenu.content.transform);
         //get launch icon script
         LauncherIcon launcherIcon = launchIcon.GetComponent<LauncherIcon>();
+        //get filename
+        string fileName = Path.GetFileName(path);
         //need to supply filename and icon as well 
-        //Sprite icon = Icon.ExtractAssociatedIcon(path);
+        Icon icon = Shell.IconFromFilePath(path);
         //give it selection capability 
-        //launcherIcon.SetupIcon(path, "", icon);
+        launcherIcon.SetupIcon(path, fileName, icon);
+        //Manual sprite override 
+        if (launchIconSprites.Length - 1 >= index && launchIconSprites[index])
+        {
+            launcherIcon.ManualSpriteOverride(launchIconSprites[index]);
+        }
     }
 
     void FindAndCopyExternalBuilds()

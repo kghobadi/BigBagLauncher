@@ -1,7 +1,9 @@
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace IconExtraction
 {
@@ -41,7 +43,7 @@ namespace IconExtraction
         #region OfFolder
 
         ///<summary>
-        /// Get the icon of an extension
+        /// Get the icon of a folder
         ///</summary>
         ///<returns>Icon</returns>
         ///<param name="overlay">bool symlink overlay</param>
@@ -56,6 +58,27 @@ namespace IconExtraction
 
         #region OfPath
 
+        /// <summary>
+        /// Simple grab from path.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static Icon IconFromFilePath(string filePath)
+        {
+            var result = (Icon)null;
+
+            try
+            {
+                result = Icon.ExtractAssociatedIcon(filePath);
+            }
+            catch (System.Exception)
+            {
+                // swallow and return nothing. You could supply a default Icon here as well
+            }
+
+            return result;
+        }
+        
         ///<summary>
         /// Get the normal,small assigned icon of the given path
         ///</summary>
@@ -97,6 +120,26 @@ namespace IconExtraction
                 return clone;
             }
             return clone;
+        }
+        
+        public static Texture2D GetTextureFromIcon(Icon icon)
+        {
+            Bitmap bmp = icon.ToBitmap();
+            var bitmapData = bmp.LockBits(new Rectangle(Point.Empty, bmp.Size), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var length = bitmapData.Stride * bitmapData.Height;
+            byte[] bytes = new byte[length];
+            // load image
+            Texture2D texture = new Texture2D(bmp.Width, bmp.Height);
+            texture.LoadImage(ImageToByte(bmp));
+            bmp.UnlockBits(bitmapData);
+
+            return texture;
+        }
+    
+        public static byte[] ImageToByte(Bitmap img)
+        {
+            ImageConverter converter = new ImageConverter();
+            return (byte[])converter.ConvertTo(img, typeof(byte[]));
         }
         #endregion
     }
