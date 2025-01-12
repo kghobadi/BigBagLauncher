@@ -5,7 +5,6 @@ using System.IO;
 using IconExtraction;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.WSA;
 using Application = UnityEngine.Application;
 
 /// <summary>
