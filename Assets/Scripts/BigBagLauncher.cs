@@ -15,7 +15,7 @@ public class BigBagLauncher : MonoBehaviour
     //Must
     //Data management of internal/external folders for launching Unity projects. 
     //Internal builds folder saved to Application.dataPath + this name 
-    [SerializeField] private string buildsFolder;
+    [SerializeField] private string buildsFolder = "/../Builds";
     private string[] launchFiles;//grabbed from build folders
     //TODO may not need this bool if just set up editor script 
     [Tooltip("Check this if you want to copy a lot of builds at once from a given external folder.")]
@@ -51,8 +51,7 @@ public class BigBagLauncher : MonoBehaviour
     {
         SetupLauncherMenu();
     }
-
-
+    
     void SetupLauncherMenu()
     {
         //Fetch all build folders from the directory 
@@ -69,20 +68,22 @@ public class BigBagLauncher : MonoBehaviour
             {
                 //For windows
                 //find all Unity .exe files within build folder
-#if UNITY_EDITOR_WIN
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
                 if (buildFiles[i].EndsWith(".exe"))
                 {
                     launchFiles[i] = buildFiles[i];
                 }
-
+                CreateLaunchIcon(launchFiles[i]);
                 return;
-#endif
+#elif UNITY_STANDALONE
                 //For Mac 
                 //find all Unity .app folders/files? in build folder  
                 if (buildFiles[i].EndsWith(".app"))
                 {
                     launchFiles[i] = buildFiles[i];
                 }
+                CreateLaunchIcon(launchFiles[i]);
+#endif
             }
         }
         
@@ -97,11 +98,17 @@ public class BigBagLauncher : MonoBehaviour
 
     }
 
-    void CreateLaunchIcon()
+    /// <summary>
+    /// Creates instance of launch Icon with provided path
+    /// </summary>
+    /// <param name="path"></param>
+    void CreateLaunchIcon(string path)
     {
-        GameObject launchIcon = Instantiate(launchIconPrefab, launcherMenu.transform);
+        GameObject launchIcon = Instantiate(launchIconPrefab, launcherMenu.content.transform);
         //get launch icon script
+        LauncherIcon launcherIcon = launchIcon.GetComponent<LauncherIcon>();
         //give it selection capability 
+        launcherIcon.SetupIcon(path);
     }
 
     void FindAndCopyExternalBuilds()
