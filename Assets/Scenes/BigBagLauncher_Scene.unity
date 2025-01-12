@@ -1914,8 +1914,9 @@ MonoBehaviour:
   launchIconPrefab: {fileID: 1646191270201574090, guid: 9a5ca8f02e43ffe478edf63b0d24e61f, type: 3}
   launcherMenu: {fileID: 204365726}
   launchIconSprites:
-  - {fileID: 21300000, guid: 6e323571bb432414995bb3c89fdfb32f, type: 3}
-  - {fileID: 21300000, guid: 47416ea9ec606464e82bfa3ab9f82679, type: 3}
+  - {fileID: 21300000, guid: 89c8c0ef95a5d604ea28f83d37da03ee, type: 3}
+  - {fileID: 21300000, guid: fc5de5d2acbbf6b4e99f2654eff86204, type: 3}
+  - {fileID: 21300000, guid: da77e26240192754081152bccdf22402, type: 3}
 --- !u!1 &2026609879
 GameObject:
   m_ObjectHideFlags: 0
