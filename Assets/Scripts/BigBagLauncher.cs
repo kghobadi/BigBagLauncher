@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.WSA;
+using Application = UnityEngine.Application;
 
 /// <summary>
 /// This component will be the main manager for the Big Bag Launcher
@@ -12,7 +15,8 @@ public class BigBagLauncher : MonoBehaviour
     //Must
     //Data management of internal/external folders for launching Unity projects. 
     //Internal builds folder saved to Application.dataPath + this name 
-    [SerializeField] private string buildsFolder; 
+    [SerializeField] private string buildsFolder;
+    private string[] launchFiles;//grabbed from build folders
     //TODO may not need this bool if just set up editor script 
     [Tooltip("Check this if you want to copy a lot of builds at once from a given external folder.")]
     [SerializeField] private bool useExternalFolder;
@@ -23,7 +27,7 @@ public class BigBagLauncher : MonoBehaviour
     //But could have it target paths you enter for variables to copy builds from 
     
     //Simple menu for display / selecting the number of games 
-    [SerializeField] private GameObject selectableIconPrefab;
+    [SerializeField] private GameObject launchIconPrefab;
     //Should this be a scroll view to account for any number of files to launch from? 
     [SerializeField] private ScrollRect launcherMenu;
     //runtime list of launch icons generated for the menu 
@@ -45,26 +49,59 @@ public class BigBagLauncher : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        SetupLauncherMenu();
     }
 
 
     void SetupLauncherMenu()
     {
-        //For windows
-        //find all Unity .exe files within build folder
+        //Fetch all build folders from the directory 
+        string[] buildDirectories = Directory.GetDirectories(Application.dataPath + buildsFolder);
+        //string[] buildZips = Directory.GetFiles(Application.dataPath + buildsFolder); may not need this
+        launchFiles = new string [buildDirectories.Length];
+        //can assume there is one build file per folder
+        for(int i = 0; i < buildDirectories.Length; i++)
+        {
+            //Get all build files in a given directory
+            string[] buildFiles = Directory.GetFiles(buildDirectories[i]);
+            //loop through build files
+            for (int f = 0; f < buildFiles.Length; f++)
+            {
+                //For windows
+                //find all Unity .exe files within build folder
+#if UNITY_EDITOR_WIN
+                if (buildFiles[i].EndsWith(".exe"))
+                {
+                    launchFiles[i] = buildFiles[i];
+                }
+
+                return;
+#endif
+                //For Mac 
+                //find all Unity .app folders/files? in build folder  
+                if (buildFiles[i].EndsWith(".app"))
+                {
+                    launchFiles[i] = buildFiles[i];
+                }
+            }
+        }
         
-        //For Mac 
-        //find all Unity .app folders/files? in build folder  
-        
+
         //check if use external
-        
+
         //Generate icons for all filePaths targeted 
-        
+
         //Eventually, will associate the filePaths with a component on the Icon prefab
         //It will handle being selected? 
         //Could handle it here too -_-
-        
+
+    }
+
+    void CreateLaunchIcon()
+    {
+        GameObject launchIcon = Instantiate(launchIconPrefab, launcherMenu.transform);
+        //get launch icon script
+        //give it selection capability 
     }
 
     void FindAndCopyExternalBuilds()
